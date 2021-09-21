@@ -11,6 +11,7 @@ from functools import partial
 from datetime import timedelta
 import voluptuous as vol
 
+from homeassistant.helpers.event import async_call_later
 from homeassistant.components.climate import ClimateEntity, PLATFORM_SCHEMA
 from homeassistant.const import (
     STATE_ON
@@ -52,6 +53,7 @@ TARGET_TEMPERATURE_STEP = 1
 
 DEFAULT_TIMEOUT = 10
 DEFAULT_SLOT = 30
+UPDATE_AFTER_ACTION_TIME = 0.5
 
 ATTR_AIR_CONDITION_MODEL = "ac_model"
 ATTR_SWING_MODE = "swing_mode"
@@ -486,4 +488,13 @@ class XiaomiAirConditioningCompanion(ClimateEntity):
             self._device.send_command,
             command,
             parameters
+        )
+
+        async def async_force_update_later(_):
+            await self.async_update_ha_state(True)
+
+        async_call_later(
+            self.hass,
+            UPDATE_AFTER_ACTION_TIME,
+            async_force_update_later
         )

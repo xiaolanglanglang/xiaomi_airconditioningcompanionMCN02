@@ -490,11 +490,8 @@ class XiaomiAirConditioningCompanion(ClimateEntity):
             parameters
         )
 
-        async def async_force_update_later(_):
-            await self.async_update_ha_state(True)
-
         async_call_later(
             self.hass,
             UPDATE_AFTER_ACTION_TIME,
-            async_force_update_later
+            self.async_update
         )
